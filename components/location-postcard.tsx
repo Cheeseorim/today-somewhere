@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { LocateFixed, Search } from "lucide-react";
+import { LocateFixed, Search, Send } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -36,6 +36,8 @@ export function LocationPostcard() {
   const [weather, setWeather] = useState<LocalWeather | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [isPublished, setIsPublished] = useState(false);
 
   async function loadWeather(url: string) {
     setIsLoading(true);
@@ -48,6 +50,7 @@ export function LocationPostcard() {
 
       setWeather(data);
       setNote(noteSuggestions[data.kind]);
+      setIsPublished(false);
     } catch (requestError) {
       setWeather(null);
       setError(
@@ -57,6 +60,49 @@ export function LocationPostcard() {
       );
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function publishPostcard() {
+    if (!weather || note.trim().length < 2) {
+      setError("두 글자 이상의 한 줄을 남겨 주세요.");
+      return;
+    }
+
+    const lastPublishedAt = Number(
+      window.localStorage.getItem("today-somewhere:last-published") ?? 0,
+    );
+    if (Date.now() - lastPublishedAt < 30000) {
+      setError("잠시 숨을 고른 뒤 다음 엽서를 보내 주세요.");
+      return;
+    }
+
+    setIsPublishing(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/postcards", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...weather, note: note.trim() }),
+      });
+      const data = (await response.json()) as { error?: string };
+      if (!response.ok) throw new Error(data.error);
+
+      window.localStorage.setItem(
+        "today-somewhere:last-published",
+        String(Date.now()),
+      );
+      setIsPublished(true);
+      window.dispatchEvent(new Event("postcard-published"));
+    } catch (publishError) {
+      setError(
+        publishError instanceof Error
+          ? publishError.message
+          : "엽서를 보내지 못했습니다.",
+      );
+    } finally {
+      setIsPublishing(false);
     }
   }
 
@@ -164,7 +210,7 @@ export function LocationPostcard() {
                 </p>
               )}
               <p className="mt-6 text-center text-xs leading-5 text-muted/70">
-                위치와 기록은 저장되거나 공개되지 않습니다.
+                현재 위치를 선택해도 정확한 좌표는 게시되지 않습니다.
               </p>
             </div>
           ) : (
@@ -211,21 +257,45 @@ export function LocationPostcard() {
                   />
                 </div>
 
-                <div className="mt-7 flex items-center justify-between">
+                <div className="mt-7 flex flex-wrap items-center justify-between gap-4">
                   <span className="text-xs text-muted">
                     Local time · {weather.localTime}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setWeather(null);
-                      setNote("");
-                    }}
-                    className="text-xs text-muted underline-offset-4 hover:text-ink hover:underline"
-                  >
-                    다른 도시
-                  </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setWeather(null);
+                        setNote("");
+                        setError("");
+                        setIsPublished(false);
+                      }}
+                      className="text-xs text-muted underline-offset-4 hover:text-ink hover:underline"
+                    >
+                      다른 도시
+                    </button>
+                    <Button
+                      type="button"
+                      onClick={publishPostcard}
+                      disabled={isPublishing || isPublished}
+                    >
+                      <Send className="size-4" strokeWidth={1.5} />
+                      {isPublished
+                        ? "엽서를 보냈어요"
+                        : isPublishing
+                          ? "보내는 중..."
+                          : "모두에게 보내기"}
+                    </Button>
+                  </div>
                 </div>
+                {error && (
+                  <p className="mt-4 text-sm text-[#9a5f50]" role="alert">
+                    {error}
+                  </p>
+                )}
+                <p className="mt-3 text-[11px] leading-5 text-muted/65">
+                  보내면 도시, 날씨와 이 문장이 다른 방문자에게 공개됩니다.
+                </p>
               </div>
             </div>
           )}

@@ -20,6 +20,10 @@ yarn-error.log*
 
 # environment variables
 .env*
+!.env.example
+
+# local postcard storage
+/data/postcards.json
 
 # typescript
 *.tsbuildinfo

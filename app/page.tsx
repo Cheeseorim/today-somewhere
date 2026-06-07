@@ -2,6 +2,7 @@ import { ArrowDown } from "lucide-react";
 
 import { CityCard } from "@/components/city-card";
 import { LocationPostcard } from "@/components/location-postcard";
+import { SharedPostcards } from "@/components/shared-postcards";
 import { SiteHeader } from "@/components/site-header";
 import { getCitiesWeather } from "@/lib/weather";
 
@@ -35,6 +36,7 @@ export default async function Home() {
         </section>
 
         <LocationPostcard />
+        <SharedPostcards />
 
         <section
           id="postcards"
