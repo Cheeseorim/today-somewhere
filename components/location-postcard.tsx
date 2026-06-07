@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { LocateFixed, Search, Send } from "lucide-react";
+import { LocateFixed, PencilLine, Search, Send } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -247,14 +247,41 @@ export function LocationPostcard() {
                     </div>
                   </div>
 
-                  <textarea
-                    value={note}
-                    onChange={(event) => setNote(event.target.value)}
-                    maxLength={100}
-                    aria-label="Your one-line note"
-                    className="mt-8 min-h-24 w-full resize-none border-y border-line bg-transparent py-6 font-serif text-2xl leading-[1.45] text-ink outline-none placeholder:text-muted/50"
-                    placeholder="오늘의 한 줄을 남겨보세요."
-                  />
+                  <div className="mt-8">
+                    <div className="mb-3 flex items-center justify-between gap-4">
+                      <label
+                        htmlFor="postcard-note"
+                        className="flex items-center gap-2 text-xs font-medium text-ink/75"
+                      >
+                        <PencilLine className="size-4" strokeWidth={1.5} />
+                        오늘의 한 줄
+                      </label>
+                      <span className="rounded-full bg-apricot/15 px-3 py-1 text-[10px] text-[#8a6245]">
+                        직접 수정해 주세요
+                      </span>
+                    </div>
+                    <div className="rounded-2xl border border-ink/15 bg-paper/65 px-5 pb-3 pt-4 transition-colors focus-within:border-moss/55 focus-within:bg-white/55 focus-within:ring-2 focus-within:ring-moss/10">
+                      <textarea
+                        id="postcard-note"
+                        value={note}
+                        onChange={(event) => {
+                          setNote(event.target.value);
+                          setIsPublished(false);
+                        }}
+                        maxLength={100}
+                        aria-describedby="postcard-note-help"
+                        className="min-h-28 w-full resize-none bg-transparent font-serif text-2xl leading-[1.45] text-ink outline-none placeholder:text-muted/50"
+                        placeholder="지금 이곳에서 있었던 작은 일을 적어보세요."
+                      />
+                      <div
+                        id="postcard-note-help"
+                        className="flex items-center justify-between border-t border-line/70 pt-3 text-[10px] text-muted/70"
+                      >
+                        <span>이 문장은 다른 방문자에게 공개됩니다.</span>
+                        <span className="tabular-nums">{note.length} / 100</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="mt-7 flex flex-wrap items-center justify-between gap-4">
