@@ -53,11 +53,16 @@ export async function getCitiesWeather(): Promise<CityWeather[]> {
         // The postcard still works with curated fallback weather.
       }
 
+      const kind = getWeatherKind(current.weatherCode, current.isDay);
+      const selectedNote = city.notes[kind];
+      const { notes: _notes, ...cityDetails } = city;
+
       return {
-        ...city,
+        ...cityDetails,
         ...current,
+        ...selectedNote,
         localTime: getLocalTime(city.timezone),
-        kind: getWeatherKind(current.weatherCode, current.isDay),
+        kind,
         weatherLabel: getWeatherLabel(current.weatherCode),
       };
     }),
