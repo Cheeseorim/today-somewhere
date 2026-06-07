@@ -1,6 +1,7 @@
 import { ArrowDown } from "lucide-react";
 
 import { CityCard } from "@/components/city-card";
+import { LocationPostcard } from "@/components/location-postcard";
 import { SiteHeader } from "@/components/site-header";
 import { getCitiesWeather } from "@/lib/weather";
 
@@ -25,13 +26,15 @@ export default async function Home() {
             <br className="hidden sm:block" /> from people around the world.
           </p>
           <a
-            href="#postcards"
+            href="#your-postcard"
             className="mt-16 flex flex-col items-center gap-3 text-[10px] uppercase tracking-[0.22em] text-muted transition-colors hover:text-ink"
           >
             Wander slowly
             <ArrowDown className="size-4 animate-gentle-bounce" strokeWidth={1.25} />
           </a>
         </section>
+
+        <LocationPostcard />
 
         <section
           id="postcards"
