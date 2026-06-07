@@ -1,5 +1,6 @@
 import { Languages } from "lucide-react";
 
+import { CityNotes } from "@/components/city-notes";
 import { Card } from "@/components/ui/card";
 import { WeatherScene } from "@/components/weather-scene";
 import { countryCodeToFlag, type CityWeather } from "@/lib/cities";
@@ -54,6 +55,8 @@ export function CityCard({ city, index }: { city: CityWeather; index: number }) 
                 <p className="mt-1 text-ink/65">{city.translation}</p>
               </div>
             </div>
+
+            <CityNotes city={city.city} />
           </div>
 
           <div className="mt-10 flex items-center justify-between text-xs text-muted">

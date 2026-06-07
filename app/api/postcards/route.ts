@@ -18,9 +18,12 @@ const recentPosts = new Map<string, number>();
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    return NextResponse.json({ postcards: await listPostcards() });
+    const city = request.nextUrl.searchParams.get("city")?.trim();
+    return NextResponse.json({
+      postcards: await listPostcards(city ? 30 : 12, city),
+    });
   } catch {
     return NextResponse.json(
       { error: "Postcards could not be loaded." },

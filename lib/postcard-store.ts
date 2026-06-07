@@ -77,10 +77,19 @@ async function writeLocalPostcards(postcards: SharedPostcard[]) {
   );
 }
 
-export async function listPostcards(limit = 12): Promise<SharedPostcard[]> {
+export async function listPostcards(
+  limit = 12,
+  city?: string,
+): Promise<SharedPostcard[]> {
   const supabase = supabaseConfig();
   if (!supabase) {
-    return (await readLocalPostcards()).slice(0, limit);
+    const postcards = await readLocalPostcards();
+    const filtered = city
+      ? postcards.filter(
+          (postcard) => postcard.city.toLowerCase() === city.toLowerCase(),
+        )
+      : postcards;
+    return filtered.slice(0, limit);
   }
 
   const endpoint = new URL(`${supabase.url}/rest/v1/postcards`);
@@ -89,6 +98,7 @@ export async function listPostcards(limit = 12): Promise<SharedPostcard[]> {
     "id,city,region,country,country_code,note,temperature,weather_label,weather_kind,local_time,created_at",
   );
   endpoint.searchParams.set("status", "eq.published");
+  if (city) endpoint.searchParams.set("city", `ilike.${city}`);
   endpoint.searchParams.set("order", "created_at.desc");
   endpoint.searchParams.set("limit", String(limit));
 
