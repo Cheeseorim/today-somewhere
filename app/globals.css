@@ -1,0 +1,243 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --font-sans: "Avenir Next", Avenir, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at 10% 5%, rgba(255, 255, 255, 0.7), transparent 24rem),
+    #f4f0e8;
+  color: #282a26;
+  font-family: var(--font-sans), sans-serif;
+}
+
+::selection {
+  background: rgba(216, 168, 121, 0.4);
+}
+
+.city-section {
+  scroll-margin-top: 4rem;
+}
+
+.weather-scene::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+  opacity: 0.16;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.42'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+}
+
+.sun {
+  position: absolute;
+  top: 18%;
+  right: 17%;
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 237, 184, 0.9);
+  box-shadow: 0 0 70px rgba(255, 227, 153, 0.55);
+}
+
+.cloud {
+  position: absolute;
+  width: 9rem;
+  height: 2.8rem;
+  border-radius: 999px;
+  background: rgba(246, 245, 236, 0.64);
+  filter: blur(0.5px);
+}
+
+.cloud::before,
+.cloud::after {
+  position: absolute;
+  bottom: 0;
+  content: "";
+  border-radius: 999px;
+  background: inherit;
+}
+
+.cloud::before {
+  left: 1.5rem;
+  width: 4.3rem;
+  height: 4.3rem;
+}
+
+.cloud::after {
+  right: 1.1rem;
+  width: 3.4rem;
+  height: 3.4rem;
+}
+
+.cloud-one {
+  top: 33%;
+  left: -12rem;
+  animation: cloud-drift 24s linear infinite;
+}
+
+.cloud-two {
+  top: 58%;
+  left: -13rem;
+  scale: 0.7;
+  opacity: 0.65;
+  animation: cloud-drift 34s linear 7s infinite;
+}
+
+.precipitation,
+.stars {
+  position: absolute;
+  inset: 0;
+}
+
+.raindrop {
+  --i: 0;
+  --x: 0%;
+  position: absolute;
+  top: -12%;
+  left: var(--x);
+  width: 1px;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: rgba(235, 244, 244, 0.58);
+  transform: rotate(10deg);
+  animation: rain-fall 1.4s linear infinite;
+  animation-delay: calc(var(--i) * -0.17s);
+}
+
+.snowflake {
+  --i: 0;
+  --x: 0%;
+  --s: 6px;
+  position: absolute;
+  top: -5%;
+  left: var(--x);
+  width: var(--s);
+  height: var(--s);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  filter: blur(0.4px);
+  animation: snow-fall 6s linear infinite;
+  animation-delay: calc(var(--i) * -0.41s);
+}
+
+.star {
+  --i: 0;
+  --x: 0%;
+  --y: 0%;
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #fff9dd;
+  box-shadow: 0 0 8px rgba(255, 249, 221, 0.8);
+  animation: twinkle 3.2s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -0.21s);
+}
+
+.moon {
+  position: absolute;
+  top: 17%;
+  right: 15%;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 999px;
+  background: #f0e3bd;
+  box-shadow: 0 0 50px rgba(240, 227, 189, 0.25);
+}
+
+.moon::after {
+  position: absolute;
+  top: -0.5rem;
+  left: -0.7rem;
+  width: 4.6rem;
+  height: 4.6rem;
+  content: "";
+  border-radius: 999px;
+  background: #34414d;
+}
+
+.animate-gentle-bounce {
+  animation: gentle-bounce 2.4s ease-in-out infinite;
+}
+
+@keyframes cloud-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(100vw + 28rem));
+  }
+}
+
+@keyframes rain-fall {
+  from {
+    transform: translate3d(0, -2rem, 0) rotate(10deg);
+  }
+  to {
+    transform: translate3d(-2rem, 24rem, 0) rotate(10deg);
+  }
+}
+
+@keyframes snow-fall {
+  0% {
+    transform: translate3d(0, -2rem, 0);
+  }
+  50% {
+    transform: translate3d(1.8rem, 11rem, 0);
+  }
+  100% {
+    transform: translate3d(-0.5rem, 23rem, 0);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+    scale: 0.8;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.35;
+  }
+}
+
+@keyframes gentle-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
