@@ -15,9 +15,9 @@ export type TemperatureUnit = "celsius" | "fahrenheit";
 const messages = {
   ko: {
     heroDate: "일요일 · 6월 7일 · 어딘가",
-    heroTitle1: "지금 그곳의 날씨,",
-    heroTitle2: "그곳의 사람이.",
-    heroBody: "예보보다 가까운, 현지의 체감과 한마디.",
+    heroTitle1: "현지인이 직접 전하는",
+    heroTitle2: "날씨 제보.",
+    heroBody: "기온과 습도보다 한 걸음 더 가까운, 지금 그곳의 체감.",
     wander: "천천히 여행하기",
     fromWhere: "당신이 있는 곳에서",
     locationTitle: "오늘, 당신이 있는 곳은?",
@@ -68,9 +68,9 @@ const messages = {
   },
   en: {
     heroDate: "Sunday · June 7 · Somewhere",
-    heroTitle1: "Weather right now,",
-    heroTitle2: "from someone there.",
-    heroBody: "Closer than a forecast: local conditions, felt and shared.",
+    heroTitle1: "Weather reports,",
+    heroTitle2: "directly from locals.",
+    heroBody: "Closer than numbers: what the weather feels like right there.",
     wander: "Wander slowly",
     fromWhere: "From where you are",
     locationTitle: "Where are you today?",

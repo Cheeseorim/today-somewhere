@@ -5,6 +5,7 @@ import { MessageCircleMore } from "lucide-react";
 
 import type { SharedPostcard } from "@/lib/postcard-store";
 import { useLanguage } from "@/lib/i18n";
+import { postcardText } from "@/lib/postcard-text";
 
 function relativeTime(date: string, locale: "ko" | "en") {
   const minutes = Math.max(
@@ -74,23 +75,31 @@ export function CityNotes({
         <div className="mt-4 h-16 animate-pulse rounded-xl bg-paper/55" />
       ) : recentPostcards.length > 0 ? (
         <div className="mt-4 space-y-2">
-          {recentPostcards.map((postcard, index) => (
-            <div
-              className="rounded-xl border border-line/70 bg-paper/60 px-4 py-3"
-              key={postcard.id}
-              style={{ marginLeft: `${index * 6}px` }}
-            >
-              <p className="font-serif text-lg leading-6 text-ink/85">
-                “{postcard.note}”
-              </p>
-              <div className="mt-2 flex items-center justify-between text-[9px] uppercase tracking-[0.12em] text-muted/65">
-                <span>
-                  {postcard.nickname || t("anonymous")} · {postcard.localTime}
-                </span>
-                <span>{relativeTime(postcard.createdAt, locale)}</span>
+          {recentPostcards.map((postcard, index) => {
+            const display = postcardText(postcard, locale);
+            return (
+              <div
+                className="rounded-xl border border-line/70 bg-paper/60 px-4 py-3"
+                key={postcard.id}
+                style={{ marginLeft: `${index * 6}px` }}
+              >
+                <p className="font-serif text-lg leading-6 text-ink/85">
+                  “{display.text}”
+                </p>
+                {display.original && (
+                  <p className="mt-2 text-[10px] leading-4 text-muted/60">
+                    {locale === "ko" ? "원문" : "Original"} · {display.original}
+                  </p>
+                )}
+                <div className="mt-2 flex items-center justify-between text-[9px] uppercase tracking-[0.12em] text-muted/65">
+                  <span>
+                    {postcard.nickname || t("anonymous")} · {postcard.localTime}
+                  </span>
+                  <span>{relativeTime(postcard.createdAt, locale)}</span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           {postcards.length > 3 && (
             <p className="pt-1 text-right text-[10px] text-muted/65">
               + {postcards.length - 3} {t("moreMoments")}

@@ -6,6 +6,7 @@ import {
   type NewPostcard,
 } from "@/lib/postcard-store";
 import type { WeatherKind } from "@/lib/cities";
+import { translatePostcard } from "@/lib/translate";
 
 const weatherKinds: WeatherKind[] = [
   "clear",
@@ -67,6 +68,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const translations = await translatePostcard(note);
     const postcard = await createPostcard({
       city: body.city.slice(0, 80),
       region: body.region?.slice(0, 80),
@@ -74,6 +76,7 @@ export async function POST(request: NextRequest) {
       countryCode: body.countryCode?.slice(0, 2) ?? "",
       nickname: body.nickname?.trim().slice(0, 20) || undefined,
       note,
+      ...translations,
       temperature: Math.round(body.temperature as number),
       humidity: Math.round(body.humidity as number),
       apparentTemperature: Number.isFinite(body.apparentTemperature)

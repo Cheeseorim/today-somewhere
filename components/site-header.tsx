@@ -23,7 +23,7 @@ export function SiteHeader() {
           href="#top"
           className="font-serif text-base tracking-[-0.02em] text-ink"
         >
-          Today, Somewhere
+          Weather From Here
         </a>
         <div className="flex items-center gap-2">
           <div

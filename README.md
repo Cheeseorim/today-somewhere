@@ -1,4 +1,4 @@
-# Today, Somewhere
+# Weather From Here
 
 A quiet collection of weather and ordinary moments from around the world.
 
@@ -28,3 +28,13 @@ The service-role key must remain server-only. Never expose it with a
 
 Published postcards contain only the city, weather, local time, and note.
 Precise coordinates are not stored.
+
+## Automatic translation
+
+Set `OPENAI_API_KEY` to translate each newly submitted report into Korean and
+English once at publish time. The default model is `gpt-4o-mini` and can be
+changed with `OPENAI_TRANSLATION_MODEL`.
+
+Each report uses one Responses API call with `temperature: 0` and
+`max_output_tokens: 200`. Saved translations are reused when visitors switch
+languages, so reading or switching languages does not trigger more model calls.

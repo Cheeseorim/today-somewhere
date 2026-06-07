@@ -4,7 +4,7 @@ import { LanguageProvider } from "@/lib/i18n";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Today, Somewhere",
+  title: "Weather From Here",
   description: "세계 곳곳의 날씨와 평범한 하루를 담은 조용한 디지털 엽서함.",
 };
 

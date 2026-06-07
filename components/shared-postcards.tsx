@@ -11,6 +11,7 @@ import {
   useLanguage,
 } from "@/lib/i18n";
 import type { SharedPostcard } from "@/lib/postcard-store";
+import { postcardText } from "@/lib/postcard-text";
 
 function relativeTime(date: string, locale: "ko" | "en") {
   const minutes = Math.max(
@@ -77,11 +78,13 @@ export function SharedPostcards() {
                 key={index}
               />
             ))
-          : postcards.map((postcard) => (
-              <Card
-                className="flex min-h-52 flex-col justify-between p-7 sm:p-8"
-                key={postcard.id}
-              >
+          : postcards.map((postcard) => {
+              const display = postcardText(postcard, locale);
+              return (
+                <Card
+                  className="flex min-h-52 flex-col justify-between p-7 sm:p-8"
+                  key={postcard.id}
+                >
                 <div className="flex items-start justify-between gap-5">
                   <div>
                     <p className="text-[10px] uppercase tracking-[0.2em] text-muted">
@@ -96,8 +99,14 @@ export function SharedPostcards() {
                       {postcard.nickname || t("anonymous")}
                     </p>
                     <blockquote className="mt-5 font-serif text-2xl leading-[1.45] tracking-[-0.02em] text-ink">
-                      “{postcard.note}”
+                      “{display.text}”
                     </blockquote>
+                    {display.original && (
+                      <p className="mt-3 text-[10px] leading-4 text-muted/60">
+                        {locale === "ko" ? "원문" : "Original"} ·{" "}
+                        {display.original}
+                      </p>
+                    )}
                   </div>
                   <div className="shrink-0 text-right">
                     <p className="font-serif text-3xl">
@@ -119,8 +128,9 @@ export function SharedPostcards() {
                   </span>
                   <span>{relativeTime(postcard.createdAt, locale)}</span>
                 </div>
-              </Card>
-            ))}
+                </Card>
+              );
+            })}
       </div>
     </section>
   );

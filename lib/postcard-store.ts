@@ -11,6 +11,9 @@ export type SharedPostcard = {
   countryCode: string;
   nickname?: string;
   note: string;
+  originalLanguage?: string;
+  translationKo?: string;
+  translationEn?: string;
   temperature: number;
   humidity?: number;
   apparentTemperature?: number;
@@ -32,6 +35,9 @@ type SupabaseRow = {
   country_code: string;
   nickname: string | null;
   note: string;
+  original_language: string | null;
+  translation_ko: string | null;
+  translation_en: string | null;
   temperature: number;
   humidity: number | null;
   apparent_temperature: number | null;
@@ -60,6 +66,9 @@ function fromRow(row: SupabaseRow): SharedPostcard {
     countryCode: row.country_code,
     nickname: row.nickname ?? undefined,
     note: row.note,
+    originalLanguage: row.original_language ?? undefined,
+    translationKo: row.translation_ko ?? undefined,
+    translationEn: row.translation_en ?? undefined,
     temperature: row.temperature,
     humidity: row.humidity ?? undefined,
     apparentTemperature: row.apparent_temperature ?? undefined,
@@ -110,7 +119,7 @@ export async function listPostcards(
   const endpoint = new URL(`${supabase.url}/rest/v1/postcards`);
   endpoint.searchParams.set(
     "select",
-    "id,city,region,country,country_code,nickname,note,temperature,humidity,apparent_temperature,wind_speed,precipitation,weather_label,weather_kind,local_time,created_at",
+    "id,city,region,country,country_code,nickname,note,original_language,translation_ko,translation_en,temperature,humidity,apparent_temperature,wind_speed,precipitation,weather_label,weather_kind,local_time,created_at",
   );
   endpoint.searchParams.set("status", "eq.published");
   if (city) endpoint.searchParams.set("city", `ilike.${city}`);
@@ -158,6 +167,9 @@ export async function createPostcard(
       country_code: postcard.countryCode,
       nickname: postcard.nickname ?? null,
       note: postcard.note,
+      original_language: postcard.originalLanguage ?? null,
+      translation_ko: postcard.translationKo ?? null,
+      translation_en: postcard.translationEn ?? null,
       temperature: postcard.temperature,
       humidity: postcard.humidity ?? null,
       apparent_temperature: postcard.apparentTemperature ?? null,
