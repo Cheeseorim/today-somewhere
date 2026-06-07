@@ -23,6 +23,46 @@ type ForecastResponse = {
   };
 };
 
+const koreanCityAliases: Record<
+  string,
+  { search: string; display: string; cityKey?: string }
+> = {
+  서울: { search: "Seoul", display: "서울" },
+  서울시: { search: "Seoul", display: "서울" },
+  부산: { search: "Busan", display: "부산" },
+  부산시: { search: "Busan", display: "부산" },
+  대구: { search: "Daegu", display: "대구" },
+  대구시: { search: "Daegu", display: "대구" },
+  인천: { search: "Incheon", display: "인천" },
+  인천시: { search: "Incheon", display: "인천" },
+  광주: { search: "Gwangju", display: "광주" },
+  광주시: { search: "Gwangju", display: "광주" },
+  대전: { search: "Daejeon", display: "대전" },
+  대전시: { search: "Daejeon", display: "대전" },
+  울산: { search: "Ulsan", display: "울산" },
+  울산시: { search: "Ulsan", display: "울산" },
+  세종: { search: "Sejong", display: "세종" },
+  세종시: { search: "Sejong", display: "세종" },
+  제주: { search: "Jeju City", display: "제주", cityKey: "Jeju" },
+  제주시: { search: "Jeju City", display: "제주", cityKey: "Jeju" },
+  서귀포: { search: "Seogwipo", display: "서귀포" },
+  서귀포시: { search: "Seogwipo", display: "서귀포" },
+  강릉: { search: "Gangneung", display: "강릉" },
+  강릉시: { search: "Gangneung", display: "강릉" },
+  전주: { search: "Jeonju", display: "전주" },
+  전주시: { search: "Jeonju", display: "전주" },
+  수원: { search: "Suwon", display: "수원" },
+  수원시: { search: "Suwon", display: "수원" },
+  춘천: { search: "Chuncheon", display: "춘천" },
+  춘천시: { search: "Chuncheon", display: "춘천" },
+  청주: { search: "Cheongju", display: "청주" },
+  청주시: { search: "Cheongju", display: "청주" },
+  포항: { search: "Pohang", display: "포항" },
+  포항시: { search: "Pohang", display: "포항" },
+  여수: { search: "Yeosu", display: "여수" },
+  여수시: { search: "Yeosu", display: "여수" },
+};
+
 function localTime(timezone: string) {
   return new Intl.DateTimeFormat("en-US", {
     timeZone: timezone,
@@ -52,6 +92,7 @@ export async function GET(request: NextRequest) {
   try {
     let location: {
       city: string;
+      cityKey: string;
       region?: string;
       country: string;
       countryCode: string;
@@ -68,10 +109,13 @@ export async function GET(request: NextRequest) {
         );
       }
 
+      const normalizedQuery = query.replace(/\s+/g, "");
+      const koreanAlias = koreanCityAliases[normalizedQuery];
+      const searchQuery = koreanAlias?.search ?? query;
       const geocodingUrl = new URL(
         "https://geocoding-api.open-meteo.com/v1/search",
       );
-      geocodingUrl.searchParams.set("name", query);
+      geocodingUrl.searchParams.set("name", searchQuery);
       geocodingUrl.searchParams.set("count", "1");
       geocodingUrl.searchParams.set("language", "en");
       geocodingUrl.searchParams.set("format", "json");
@@ -91,7 +135,8 @@ export async function GET(request: NextRequest) {
       }
 
       location = {
-        city: result.name,
+        city: koreanAlias?.display ?? result.name,
+        cityKey: koreanAlias?.cityKey ?? result.name,
         region: result.admin1,
         country: result.country ?? "Somewhere",
         countryCode: result.country_code ?? "",
@@ -102,6 +147,7 @@ export async function GET(request: NextRequest) {
     } else if (hasCoordinates) {
       location = {
         city: "Near you",
+        cityKey: "Near you",
         country: "Your current area",
         countryCode: "",
         latitude,

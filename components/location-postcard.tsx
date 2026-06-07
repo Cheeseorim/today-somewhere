@@ -13,6 +13,7 @@ import {
 
 type LocalWeather = {
   city: string;
+  cityKey: string;
   region?: string;
   country: string;
   countryCode: string;
@@ -84,7 +85,11 @@ export function LocationPostcard() {
       const response = await fetch("/api/postcards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...weather, note: note.trim() }),
+        body: JSON.stringify({
+          ...weather,
+          city: weather.cityKey,
+          note: note.trim(),
+        }),
       });
       const data = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(data.error);
@@ -172,7 +177,7 @@ export function LocationPostcard() {
                     id="city-search"
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
-                    placeholder="Seoul, Busan, Paris..."
+                    placeholder="서울, 부산, Seoul, Paris..."
                     className="h-12 min-w-0 flex-1 rounded-full border border-ink/15 bg-paper/55 px-5 text-sm text-ink outline-none placeholder:text-muted/60 focus:border-moss/50 focus:ring-2 focus:ring-moss/10"
                     autoComplete="address-level2"
                   />
