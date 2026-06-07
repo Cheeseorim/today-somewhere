@@ -1,31 +1,42 @@
+"use client";
+
 import { Languages } from "lucide-react";
 
 import { CityNotes } from "@/components/city-notes";
 import { Card } from "@/components/ui/card";
 import { WeatherScene } from "@/components/weather-scene";
 import { countryCodeToFlag, type CityWeather } from "@/lib/cities";
+import {
+  localizedCity,
+  localizedCountry,
+  localizedWeather,
+  useLanguage,
+} from "@/lib/i18n";
 
 export function CityCard({ city, index }: { city: CityWeather; index: number }) {
+  const { locale, t } = useLanguage();
+  const displayCity = localizedCity(city.city, locale);
+
   return (
     <article className="city-section flex min-h-[88svh] items-center py-12 md:min-h-screen md:py-20">
       <Card className="grid w-full overflow-hidden p-2 backdrop-blur-sm md:grid-cols-[1.12fr_0.88fr] md:p-3">
-        <WeatherScene kind={city.kind} city={city.city} />
+        <WeatherScene kind={city.kind} city={displayCity} />
 
         <div className="flex min-h-[330px] flex-col justify-between px-6 pb-7 pt-8 sm:px-9 md:min-h-0 md:px-12 md:py-10">
           <div>
             <div className="flex items-start justify-between gap-6">
               <div>
                 <p className="mb-3 text-xs uppercase tracking-[0.22em] text-muted">
-                  Postcard {String(index + 1).padStart(2, "0")}
+                  {t("postcard")} {String(index + 1).padStart(2, "0")}
                 </p>
                 <h2 className="font-serif text-4xl tracking-[-0.03em] text-ink sm:text-5xl">
-                  {city.city}
+                  {displayCity}
                 </h2>
                 <p className="mt-2 flex items-center gap-2 text-sm text-muted">
                   <span aria-hidden="true" className="text-base">
                     {countryCodeToFlag(city.country)}
                   </span>
-                  {city.countryName}
+                  {localizedCountry(city.countryName, locale)}
                 </p>
               </div>
 
@@ -33,7 +44,9 @@ export function CityCard({ city, index }: { city: CityWeather; index: number }) 
                 <p className="font-serif text-5xl tracking-[-0.07em] text-ink">
                   {city.temperature}°
                 </p>
-                <p className="mt-1 text-xs text-muted">{city.weatherLabel}</p>
+                <p className="mt-1 text-xs text-muted">
+                  {localizedWeather(city.weatherLabel, locale)}
+                </p>
               </div>
             </div>
 
@@ -50,17 +63,17 @@ export function CityCard({ city, index }: { city: CityWeather; index: number }) 
               <Languages className="mt-1 size-4 shrink-0" strokeWidth={1.5} />
               <div>
                 <p className="text-xs uppercase tracking-[0.16em]">
-                  {city.languageLabel} · translated
+                  {city.languageLabel} · {t("translated")}
                 </p>
                 <p className="mt-1 text-ink/65">{city.translation}</p>
               </div>
             </div>
 
-            <CityNotes city={city.city} />
+            <CityNotes city={city.city} displayCity={displayCity} />
           </div>
 
           <div className="mt-10 flex items-center justify-between text-xs text-muted">
-            <span>Local time</span>
+            <span>{t("localTime")}</span>
             <span className="font-medium tabular-nums text-ink/75">
               {city.localTime}
             </span>

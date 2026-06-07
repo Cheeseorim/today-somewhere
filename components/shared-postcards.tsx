@@ -4,21 +4,29 @@ import { useCallback, useEffect, useState } from "react";
 
 import { Card } from "@/components/ui/card";
 import { countryCodeToFlag } from "@/lib/cities";
+import {
+  localizedCity,
+  localizedWeather,
+  useLanguage,
+} from "@/lib/i18n";
 import type { SharedPostcard } from "@/lib/postcard-store";
 
-function relativeTime(date: string) {
+function relativeTime(date: string, locale: "ko" | "en") {
   const minutes = Math.max(
     0,
     Math.floor((Date.now() - new Date(date).getTime()) / 60000),
   );
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1) return locale === "ko" ? "방금" : "just now";
+  if (minutes < 60) return locale === "ko" ? `${minutes}분 전` : `${minutes}m ago`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
+  if (hours < 24) return locale === "ko" ? `${hours}시간 전` : `${hours}h ago`;
+  return locale === "ko"
+    ? `${Math.floor(hours / 24)}일 전`
+    : `${Math.floor(hours / 24)}d ago`;
 }
 
 export function SharedPostcards() {
+  const { locale, t } = useLanguage();
   const [postcards, setPostcards] = useState<SharedPostcard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -50,13 +58,13 @@ export function SharedPostcards() {
     >
       <div className="mb-10 text-center">
         <p className="text-[10px] uppercase tracking-[0.28em] text-muted">
-          Sent moments
+          {t("sentMoments")}
         </p>
         <h2
           id="community-heading"
           className="mt-4 font-serif text-4xl tracking-[-0.04em] text-ink sm:text-5xl"
         >
-          방금 도착한 엽서
+          {t("recentPostcards")}
         </h2>
       </div>
 
@@ -81,7 +89,7 @@ export function SharedPostcards() {
                           {countryCodeToFlag(postcard.countryCode)}
                         </span>
                       )}
-                      {postcard.city}
+                      {localizedCity(postcard.city, locale)}
                     </p>
                     <blockquote className="mt-5 font-serif text-2xl leading-[1.45] tracking-[-0.02em] text-ink">
                       “{postcard.note}”
@@ -90,13 +98,15 @@ export function SharedPostcards() {
                   <div className="shrink-0 text-right">
                     <p className="font-serif text-3xl">{postcard.temperature}°</p>
                     <p className="mt-1 text-[10px] text-muted">
-                      {postcard.weatherLabel}
+                      {localizedWeather(postcard.weatherLabel, locale)}
                     </p>
                   </div>
                 </div>
                 <div className="mt-7 flex justify-between text-[10px] uppercase tracking-[0.14em] text-muted/75">
-                  <span>{postcard.localTime} local</span>
-                  <span>{relativeTime(postcard.createdAt)}</span>
+                  <span>
+                    {postcard.localTime} {locale === "ko" ? "현지" : "local"}
+                  </span>
+                  <span>{relativeTime(postcard.createdAt, locale)}</span>
                 </div>
               </Card>
             ))}

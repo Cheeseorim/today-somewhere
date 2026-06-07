@@ -4,20 +4,30 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { MessageCircleMore } from "lucide-react";
 
 import type { SharedPostcard } from "@/lib/postcard-store";
+import { useLanguage } from "@/lib/i18n";
 
-function relativeTime(date: string) {
+function relativeTime(date: string, locale: "ko" | "en") {
   const minutes = Math.max(
     0,
     Math.floor((Date.now() - new Date(date).getTime()) / 60000),
   );
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 1) return locale === "ko" ? "방금" : "just now";
+  if (minutes < 60) return locale === "ko" ? `${minutes}분 전` : `${minutes}m ago`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  return `${Math.floor(hours / 24)}d ago`;
+  if (hours < 24) return locale === "ko" ? `${hours}시간 전` : `${hours}h ago`;
+  return locale === "ko"
+    ? `${Math.floor(hours / 24)}일 전`
+    : `${Math.floor(hours / 24)}d ago`;
 }
 
-export function CityNotes({ city }: { city: string }) {
+export function CityNotes({
+  city,
+  displayCity,
+}: {
+  city: string;
+  displayCity: string;
+}) {
+  const { locale, t } = useLanguage();
   const [postcards, setPostcards] = useState<SharedPostcard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -49,11 +59,13 @@ export function CityNotes({ city }: { city: string }) {
       <div className="flex items-center justify-between gap-4">
         <p className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] text-muted">
           <MessageCircleMore className="size-4" strokeWidth={1.4} />
-          From people in {city}
+          {t("fromPeople")} {locale === "en" ? displayCity : ""}
         </p>
         {!isLoading && postcards.length > 0 && (
           <span className="text-[10px] tabular-nums text-muted/70">
-            {postcards.length} {postcards.length === 1 ? "note" : "notes"}
+            {locale === "ko"
+              ? `${postcards.length}${t("note")}`
+              : `${postcards.length} ${postcards.length === 1 ? "note" : "notes"}`}
           </span>
         )}
       </div>
@@ -73,19 +85,19 @@ export function CityNotes({ city }: { city: string }) {
               </p>
               <div className="mt-2 flex items-center justify-between text-[9px] uppercase tracking-[0.12em] text-muted/65">
                 <span>{postcard.localTime} local</span>
-                <span>{relativeTime(postcard.createdAt)}</span>
+                <span>{relativeTime(postcard.createdAt, locale)}</span>
               </div>
             </div>
           ))}
           {postcards.length > 3 && (
             <p className="pt-1 text-right text-[10px] text-muted/65">
-              + {postcards.length - 3} more moments
+              + {postcards.length - 3} {t("moreMoments")}
             </p>
           )}
         </div>
       ) : (
         <p className="mt-4 text-sm leading-6 text-muted/65">
-          아직 이 도시에서 도착한 기록이 없어요. 첫 번째 엽서를 남겨보세요.
+          {t("noNotes")}
         </p>
       )}
     </div>

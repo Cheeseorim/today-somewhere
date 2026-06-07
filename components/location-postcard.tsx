@@ -10,6 +10,12 @@ import {
   countryCodeToFlag,
   type WeatherKind,
 } from "@/lib/cities";
+import {
+  localizedCity,
+  localizedCountry,
+  localizedWeather,
+  useLanguage,
+} from "@/lib/i18n";
 
 type LocalWeather = {
   city: string;
@@ -23,15 +29,25 @@ type LocalWeather = {
   kind: WeatherKind;
 };
 
-const noteSuggestions: Record<WeatherKind, string> = {
-  clear: "햇빛이 좋아서 잠깐 먼 길로 돌아왔어요.",
-  cloudy: "흐린 하늘 아래 오늘은 동네가 조금 조용해 보여요.",
-  rain: "빗소리를 들으며 천천히 집으로 돌아왔어요.",
-  snow: "눈이 내리자 익숙한 길이 잠시 낯설어졌어요.",
-  night: "하루가 끝난 뒤에도 몇몇 창문은 아직 밝아요.",
+const noteSuggestions: Record<"ko" | "en", Record<WeatherKind, string>> = {
+  ko: {
+    clear: "햇빛이 좋아서 잠깐 먼 길로 돌아왔어요.",
+    cloudy: "흐린 하늘 아래 오늘은 동네가 조금 조용해 보여요.",
+    rain: "빗소리를 들으며 천천히 집으로 돌아왔어요.",
+    snow: "눈이 내리자 익숙한 길이 잠시 낯설어졌어요.",
+    night: "하루가 끝난 뒤에도 몇몇 창문은 아직 밝아요.",
+  },
+  en: {
+    clear: "The sunlight was lovely, so I took the longer way home.",
+    cloudy: "The neighborhood feels a little quieter beneath the gray sky.",
+    rain: "I walked home slowly, listening to the rain.",
+    snow: "The familiar street looked new for a moment under the snow.",
+    night: "A few windows are still glowing after the day has ended.",
+  },
 };
 
 export function LocationPostcard() {
+  const { locale, t } = useLanguage();
   const [query, setQuery] = useState("");
   const [note, setNote] = useState("");
   const [weather, setWeather] = useState<LocalWeather | null>(null);
@@ -50,7 +66,7 @@ export function LocationPostcard() {
       if (!response.ok) throw new Error(data.error);
 
       setWeather(data);
-      setNote(noteSuggestions[data.kind]);
+      setNote(noteSuggestions[locale][data.kind]);
       setIsPublished(false);
     } catch (requestError) {
       setWeather(null);
@@ -66,7 +82,11 @@ export function LocationPostcard() {
 
   async function publishPostcard() {
     if (!weather || note.trim().length < 2) {
-      setError("두 글자 이상의 한 줄을 남겨 주세요.");
+      setError(
+        locale === "ko"
+          ? "두 글자 이상의 한 줄을 남겨 주세요."
+          : "Please write at least two characters.",
+      );
       return;
     }
 
@@ -74,7 +94,11 @@ export function LocationPostcard() {
       window.localStorage.getItem("today-somewhere:last-published") ?? 0,
     );
     if (Date.now() - lastPublishedAt < 30000) {
-      setError("잠시 숨을 고른 뒤 다음 엽서를 보내 주세요.");
+      setError(
+        locale === "ko"
+          ? "잠시 숨을 고른 뒤 다음 엽서를 보내 주세요."
+          : "Please wait a moment before sending another postcard.",
+      );
       return;
     }
 
@@ -104,7 +128,9 @@ export function LocationPostcard() {
       setError(
         publishError instanceof Error
           ? publishError.message
-          : "엽서를 보내지 못했습니다.",
+          : locale === "ko"
+            ? "엽서를 보내지 못했습니다."
+            : "The postcard could not be sent.",
       );
     } finally {
       setIsPublishing(false);
@@ -115,7 +141,9 @@ export function LocationPostcard() {
     event.preventDefault();
     const city = query.trim();
     if (!city) {
-      setError("도시 이름을 입력해 주세요.");
+      setError(
+        locale === "ko" ? "도시 이름을 입력해 주세요." : "Enter a city name.",
+      );
       return;
     }
 
@@ -124,7 +152,11 @@ export function LocationPostcard() {
 
   function useCurrentLocation() {
     if (!navigator.geolocation) {
-      setError("이 브라우저에서는 현재 위치를 사용할 수 없습니다.");
+      setError(
+        locale === "ko"
+          ? "이 브라우저에서는 현재 위치를 사용할 수 없습니다."
+          : "Current location is unavailable in this browser.",
+      );
       return;
     }
 
@@ -138,7 +170,11 @@ export function LocationPostcard() {
       },
       () => {
         setIsLoading(false);
-        setError("위치 권한이 허용되지 않았습니다. 도시명으로 검색해 주세요.");
+        setError(
+          locale === "ko"
+            ? "위치 권한이 허용되지 않았습니다. 도시명으로 검색해 주세요."
+            : "Location permission was not allowed. Search by city instead.",
+        );
       },
       { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 },
     );
@@ -152,13 +188,13 @@ export function LocationPostcard() {
       <div className="w-full">
         <div className="mx-auto mb-10 max-w-xl text-center">
           <p className="text-[10px] uppercase tracking-[0.28em] text-muted">
-            From where you are
+            {t("fromWhere")}
           </p>
           <h2 className="mt-4 font-serif text-4xl tracking-[-0.04em] text-ink sm:text-5xl">
-            오늘, 당신이 있는 곳은?
+            {t("locationTitle")}
           </h2>
           <p className="mt-4 text-sm leading-7 text-muted">
-            도시를 찾고, 지금의 날씨에 짧은 한 줄을 남겨보세요.
+            {t("locationBody")}
           </p>
         </div>
 
@@ -170,21 +206,27 @@ export function LocationPostcard() {
                   htmlFor="city-search"
                   className="text-xs uppercase tracking-[0.18em] text-muted"
                 >
-                  Your city
+                  {t("yourCity")}
                 </label>
                 <div className="mt-3 flex gap-2">
                   <input
                     id="city-search"
                     value={query}
                     onChange={(event) => setQuery(event.target.value)}
-                    placeholder="서울, 부산, Seoul, Paris..."
+                    placeholder={
+                      locale === "ko"
+                        ? "서울, 부산, 제주..."
+                        : "Seoul, Busan, Paris..."
+                    }
                     className="h-12 min-w-0 flex-1 rounded-full border border-ink/15 bg-paper/55 px-5 text-sm text-ink outline-none placeholder:text-muted/60 focus:border-moss/50 focus:ring-2 focus:ring-moss/10"
                     autoComplete="address-level2"
                   />
                   <Button
                     type="submit"
                     size="icon"
-                    aria-label="Search city weather"
+                    aria-label={
+                      locale === "ko" ? "도시 날씨 검색" : "Search city weather"
+                    }
                     disabled={isLoading}
                   >
                     <Search className="size-4" strokeWidth={1.5} />
@@ -206,7 +248,7 @@ export function LocationPostcard() {
                 className="self-center"
               >
                 <LocateFixed className="size-4" strokeWidth={1.5} />
-                {isLoading ? "Finding the sky..." : "현재 위치 사용"}
+                {isLoading ? t("findingSky") : t("useLocation")}
               </Button>
 
               {error && (
@@ -215,21 +257,24 @@ export function LocationPostcard() {
                 </p>
               )}
               <p className="mt-6 text-center text-xs leading-5 text-muted/70">
-                현재 위치를 선택해도 정확한 좌표는 게시되지 않습니다.
+                {t("locationPrivacy")}
               </p>
             </div>
           ) : (
             <div className="grid md:grid-cols-[1.08fr_0.92fr]">
-              <WeatherScene kind={weather.kind} city={weather.city} />
+              <WeatherScene
+                kind={weather.kind}
+                city={localizedCity(weather.city, locale)}
+              />
               <div className="flex min-h-[360px] flex-col justify-between px-6 pb-7 pt-8 sm:px-10 md:py-10">
                 <div>
                   <div className="flex items-start justify-between gap-5">
                     <div>
                       <p className="text-[10px] uppercase tracking-[0.22em] text-muted">
-                        My postcard
+                        {t("myPostcard")}
                       </p>
                       <h3 className="mt-3 font-serif text-4xl tracking-[-0.04em]">
-                        {weather.city}
+                        {localizedCity(weather.city, locale)}
                       </h3>
                       <p className="mt-2 text-sm text-muted">
                         {weather.countryCode && (
@@ -238,8 +283,8 @@ export function LocationPostcard() {
                           </span>
                         )}
                         {weather.region
-                          ? `${weather.region}, ${weather.country}`
-                          : weather.country}
+                          ? `${weather.region}, ${localizedCountry(weather.country, locale)}`
+                          : localizedCountry(weather.country, locale)}
                       </p>
                     </div>
                     <div className="text-right">
@@ -247,7 +292,7 @@ export function LocationPostcard() {
                         {weather.temperature}°
                       </p>
                       <p className="mt-1 text-xs text-muted">
-                        {weather.weatherLabel}
+                        {localizedWeather(weather.weatherLabel, locale)}
                       </p>
                     </div>
                   </div>
@@ -259,10 +304,10 @@ export function LocationPostcard() {
                         className="flex items-center gap-2 text-xs font-medium text-ink/75"
                       >
                         <PencilLine className="size-4" strokeWidth={1.5} />
-                        오늘의 한 줄
+                        {t("noteLabel")}
                       </label>
                       <span className="rounded-full bg-apricot/15 px-3 py-1 text-[10px] text-[#8a6245]">
-                        직접 수정해 주세요
+                        {t("editHint")}
                       </span>
                     </div>
                     <div className="rounded-2xl border border-ink/15 bg-paper/65 px-5 pb-3 pt-4 transition-colors focus-within:border-moss/55 focus-within:bg-white/55 focus-within:ring-2 focus-within:ring-moss/10">
@@ -276,13 +321,13 @@ export function LocationPostcard() {
                         maxLength={100}
                         aria-describedby="postcard-note-help"
                         className="min-h-28 w-full resize-none bg-transparent font-serif text-2xl leading-[1.45] text-ink outline-none placeholder:text-muted/50"
-                        placeholder="지금 이곳에서 있었던 작은 일을 적어보세요."
+                        placeholder={t("notePlaceholder")}
                       />
                       <div
                         id="postcard-note-help"
                         className="flex items-center justify-between border-t border-line/70 pt-3 text-[10px] text-muted/70"
                       >
-                        <span>이 문장은 다른 방문자에게 공개됩니다.</span>
+                        <span>{t("notePublic")}</span>
                         <span className="tabular-nums">{note.length} / 100</span>
                       </div>
                     </div>
@@ -291,7 +336,7 @@ export function LocationPostcard() {
 
                 <div className="mt-7 flex flex-wrap items-center justify-between gap-4">
                   <span className="text-xs text-muted">
-                    Local time · {weather.localTime}
+                    {t("localTime")} · {weather.localTime}
                   </span>
                   <div className="flex items-center gap-3">
                     <button
@@ -304,7 +349,7 @@ export function LocationPostcard() {
                       }}
                       className="text-xs text-muted underline-offset-4 hover:text-ink hover:underline"
                     >
-                      다른 도시
+                      {t("otherCity")}
                     </button>
                     <Button
                       type="button"
@@ -313,10 +358,10 @@ export function LocationPostcard() {
                     >
                       <Send className="size-4" strokeWidth={1.5} />
                       {isPublished
-                        ? "엽서를 보냈어요"
+                        ? t("sent")
                         : isPublishing
-                          ? "보내는 중..."
-                          : "모두에게 보내기"}
+                          ? t("sending")
+                          : t("send")}
                     </Button>
                   </div>
                 </div>
@@ -326,7 +371,7 @@ export function LocationPostcard() {
                   </p>
                 )}
                 <p className="mt-3 text-[11px] leading-5 text-muted/65">
-                  보내면 도시, 날씨와 이 문장이 다른 방문자에게 공개됩니다.
+                  {t("sendNotice")}
                 </p>
               </div>
             </div>

@@ -1,5 +1,8 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import type { WeatherKind } from "@/lib/cities";
+import { useLanguage } from "@/lib/i18n";
 
 const sceneThemes: Record<WeatherKind, string> = {
   clear: "from-[#b9cfcb] via-[#d8ddd0] to-[#e8d9bd]",
@@ -16,6 +19,7 @@ export function WeatherScene({
   kind: WeatherKind;
   city: string;
 }) {
+  const { locale } = useLanguage();
   const isNight = kind === "night";
 
   return (
@@ -24,7 +28,9 @@ export function WeatherScene({
         "weather-scene relative min-h-[300px] overflow-hidden rounded-[1.75rem] bg-gradient-to-br",
         sceneThemes[kind],
       )}
-      aria-label={`${kind} weather in ${city}`}
+      aria-label={
+        locale === "ko" ? `${city}의 현재 날씨` : `${kind} weather in ${city}`
+      }
       role="img"
     >
       <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0.12),transparent_45%)]" />
@@ -94,7 +100,7 @@ export function WeatherScene({
 
       <div className="absolute inset-x-0 bottom-0 h-[38%] bg-gradient-to-t from-black/15 to-transparent" />
       <p className="absolute bottom-5 left-6 text-[10px] uppercase tracking-[0.28em] text-white/70">
-        A small view from {city}
+        {locale === "ko" ? `${city}의 작은 풍경` : `A small view from ${city}`}
       </p>
     </div>
   );
