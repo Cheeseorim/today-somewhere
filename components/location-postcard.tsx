@@ -34,27 +34,11 @@ type LocalWeather = {
   kind: WeatherKind;
 };
 
-const noteSuggestions: Record<"ko" | "en", Record<WeatherKind, string>> = {
-  ko: {
-    clear: "햇빛이 좋아서 잠깐 먼 길로 돌아왔어요.",
-    cloudy: "흐린 하늘 아래 오늘은 동네가 조금 조용해 보여요.",
-    rain: "빗소리를 들으며 천천히 집으로 돌아왔어요.",
-    snow: "눈이 내리자 익숙한 길이 잠시 낯설어졌어요.",
-    night: "하루가 끝난 뒤에도 몇몇 창문은 아직 밝아요.",
-  },
-  en: {
-    clear: "The sunlight was lovely, so I took the longer way home.",
-    cloudy: "The neighborhood feels a little quieter beneath the gray sky.",
-    rain: "I walked home slowly, listening to the rain.",
-    snow: "The familiar street looked new for a moment under the snow.",
-    night: "A few windows are still glowing after the day has ended.",
-  },
-};
-
 export function LocationPostcard() {
   const { locale, temperatureUnit, t } = useLanguage();
   const [query, setQuery] = useState("");
   const [note, setNote] = useState("");
+  const [nickname, setNickname] = useState("");
   const [weather, setWeather] = useState<LocalWeather | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -71,7 +55,7 @@ export function LocationPostcard() {
       if (!response.ok) throw new Error(data.error);
 
       setWeather(data);
-      setNote(noteSuggestions[locale][data.kind]);
+      setNote(weatherSuggestion(data, locale));
       setIsPublished(false);
     } catch (requestError) {
       setWeather(null);
@@ -117,6 +101,7 @@ export function LocationPostcard() {
         body: JSON.stringify({
           ...weather,
           city: weather.cityKey,
+          nickname: nickname.trim(),
           note: note.trim(),
         }),
       });
@@ -310,6 +295,27 @@ export function LocationPostcard() {
                   </div>
 
                   <div className="mt-8">
+                    <div className="mb-5">
+                      <div className="mb-2 flex items-center justify-between">
+                        <label
+                          htmlFor="postcard-nickname"
+                          className="text-xs font-medium text-ink/75"
+                        >
+                          {t("nickname")}
+                        </label>
+                        <span className="text-[10px] text-muted/65">
+                          {t("nicknameOptional")}
+                        </span>
+                      </div>
+                      <input
+                        id="postcard-nickname"
+                        value={nickname}
+                        onChange={(event) => setNickname(event.target.value)}
+                        maxLength={20}
+                        placeholder={t("nicknamePlaceholder")}
+                        className="h-11 w-full rounded-xl border border-ink/15 bg-paper/65 px-4 text-sm text-ink outline-none placeholder:text-muted/45 focus:border-moss/55 focus:bg-white/55 focus:ring-2 focus:ring-moss/10"
+                      />
+                    </div>
                     <div className="mb-3 flex items-center justify-between gap-4">
                       <label
                         htmlFor="postcard-note"
@@ -356,6 +362,7 @@ export function LocationPostcard() {
                       onClick={() => {
                         setWeather(null);
                         setNote("");
+                        setNickname("");
                         setError("");
                         setIsPublished(false);
                       }}
@@ -392,6 +399,54 @@ export function LocationPostcard() {
       </div>
     </section>
   );
+}
+
+function weatherSuggestion(weather: LocalWeather, locale: "ko" | "en") {
+  if (locale === "en") {
+    if (weather.kind === "rain" || weather.precipitation > 0) {
+      return weather.precipitation >= 1
+        ? "Bring an umbrella. The rain is steady enough to get wet quickly."
+        : "A small umbrella would help. It is raining lightly right now.";
+    }
+    if (weather.kind === "snow") {
+      return "The ground may be slippery. Shoes with good grip would help.";
+    }
+    if (weather.apparentTemperature >= 28) {
+      return "It feels too hot for a comfortable run. Light clothes are best.";
+    }
+    if (weather.apparentTemperature <= 8) {
+      return "A warm outer layer is needed, especially when the wind picks up.";
+    }
+    if (weather.windSpeed >= 20) {
+      return "The wind is strong enough to make a light jacket feel necessary.";
+    }
+    if (weather.humidity >= 75) {
+      return "It feels humid and sticky. Outdoor exercise may feel harder.";
+    }
+    return "A light layer is enough, and it feels comfortable for a walk.";
+  }
+
+  if (weather.kind === "rain" || weather.precipitation > 0) {
+    return weather.precipitation >= 1
+      ? "우산을 꼭 챙기세요. 금방 옷이 젖을 정도로 비가 오고 있어요."
+      : "작은 우산이 있으면 좋아요. 지금은 약한 비가 내리고 있어요.";
+  }
+  if (weather.kind === "snow") {
+    return "길이 미끄러울 수 있어요. 바닥이 잘 미끄러지지 않는 신발이 좋아요.";
+  }
+  if (weather.apparentTemperature >= 28) {
+    return "뛰기에는 꽤 더워요. 가벼운 옷과 물을 챙기는 게 좋아요.";
+  }
+  if (weather.apparentTemperature <= 8) {
+    return "바람이 불면 더 춥게 느껴져요. 따뜻한 겉옷이 필요해요.";
+  }
+  if (weather.windSpeed >= 20) {
+    return "바람이 강해서 얇은 바람막이를 챙기는 게 좋아요.";
+  }
+  if (weather.humidity >= 75) {
+    return "습도가 높아 후텁지근해요. 야외 운동은 평소보다 힘들 수 있어요.";
+  }
+  return "얇은 겉옷이면 충분하고, 걷거나 가볍게 뛰기 좋은 날씨예요.";
 }
 
 function WeatherMetric({

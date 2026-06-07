@@ -84,7 +84,9 @@ export function CityNotes({
                 “{postcard.note}”
               </p>
               <div className="mt-2 flex items-center justify-between text-[9px] uppercase tracking-[0.12em] text-muted/65">
-                <span>{postcard.localTime} local</span>
+                <span>
+                  {postcard.nickname || t("anonymous")} · {postcard.localTime}
+                </span>
                 <span>{relativeTime(postcard.createdAt, locale)}</span>
               </div>
             </div>

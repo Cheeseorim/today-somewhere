@@ -92,6 +92,9 @@ export function SharedPostcards() {
                       )}
                       {localizedCity(postcard.city, locale)}
                     </p>
+                    <p className="mt-2 text-[10px] text-muted/70">
+                      {postcard.nickname || t("anonymous")}
+                    </p>
                     <blockquote className="mt-5 font-serif text-2xl leading-[1.45] tracking-[-0.02em] text-ink">
                       “{postcard.note}”
                     </blockquote>

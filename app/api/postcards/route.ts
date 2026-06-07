@@ -72,6 +72,7 @@ export async function POST(request: NextRequest) {
       region: body.region?.slice(0, 80),
       country: body.country.slice(0, 80),
       countryCode: body.countryCode?.slice(0, 2) ?? "",
+      nickname: body.nickname?.trim().slice(0, 20) || undefined,
       note,
       temperature: Math.round(body.temperature as number),
       humidity: Math.round(body.humidity as number),

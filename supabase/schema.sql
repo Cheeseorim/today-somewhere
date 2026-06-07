@@ -4,6 +4,7 @@ create table if not exists public.postcards (
   region text,
   country text not null check (char_length(country) between 1 and 80),
   country_code text not null default '',
+  nickname text check (char_length(nickname) between 1 and 20),
   note text not null check (char_length(note) between 2 and 100),
   temperature smallint not null,
   humidity smallint,
@@ -26,6 +27,7 @@ create index if not exists postcards_created_at_idx
 
 alter table public.postcards
   add column if not exists humidity smallint,
+  add column if not exists nickname text,
   add column if not exists apparent_temperature smallint,
   add column if not exists wind_speed smallint,
   add column if not exists precipitation numeric(6, 2);

@@ -9,6 +9,7 @@ export type SharedPostcard = {
   region?: string;
   country: string;
   countryCode: string;
+  nickname?: string;
   note: string;
   temperature: number;
   humidity?: number;
@@ -29,6 +30,7 @@ type SupabaseRow = {
   region: string | null;
   country: string;
   country_code: string;
+  nickname: string | null;
   note: string;
   temperature: number;
   humidity: number | null;
@@ -56,6 +58,7 @@ function fromRow(row: SupabaseRow): SharedPostcard {
     region: row.region ?? undefined,
     country: row.country,
     countryCode: row.country_code,
+    nickname: row.nickname ?? undefined,
     note: row.note,
     temperature: row.temperature,
     humidity: row.humidity ?? undefined,
@@ -107,7 +110,7 @@ export async function listPostcards(
   const endpoint = new URL(`${supabase.url}/rest/v1/postcards`);
   endpoint.searchParams.set(
     "select",
-    "id,city,region,country,country_code,note,temperature,humidity,apparent_temperature,wind_speed,precipitation,weather_label,weather_kind,local_time,created_at",
+    "id,city,region,country,country_code,nickname,note,temperature,humidity,apparent_temperature,wind_speed,precipitation,weather_label,weather_kind,local_time,created_at",
   );
   endpoint.searchParams.set("status", "eq.published");
   if (city) endpoint.searchParams.set("city", `ilike.${city}`);
@@ -153,6 +156,7 @@ export async function createPostcard(
       region: postcard.region ?? null,
       country: postcard.country,
       country_code: postcard.countryCode,
+      nickname: postcard.nickname ?? null,
       note: postcard.note,
       temperature: postcard.temperature,
       humidity: postcard.humidity ?? null,
