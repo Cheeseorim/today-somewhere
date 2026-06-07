@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { countryCodeToFlag } from "@/lib/cities";
 import {
+  formatTemperature,
   localizedCity,
   localizedWeather,
   useLanguage,
@@ -26,7 +27,7 @@ function relativeTime(date: string, locale: "ko" | "en") {
 }
 
 export function SharedPostcards() {
-  const { locale, t } = useLanguage();
+  const { locale, temperatureUnit, t } = useLanguage();
   const [postcards, setPostcards] = useState<SharedPostcard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -96,10 +97,17 @@ export function SharedPostcards() {
                     </blockquote>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="font-serif text-3xl">{postcard.temperature}°</p>
+                    <p className="font-serif text-3xl">
+                      {formatTemperature(postcard.temperature, temperatureUnit)}
+                    </p>
                     <p className="mt-1 text-[10px] text-muted">
                       {localizedWeather(postcard.weatherLabel, locale)}
                     </p>
+                    {typeof postcard.humidity === "number" && (
+                      <p className="mt-1 text-[10px] text-muted">
+                        {t("humidity")} {postcard.humidity}%
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div className="mt-7 flex justify-between text-[10px] uppercase tracking-[0.14em] text-muted/75">

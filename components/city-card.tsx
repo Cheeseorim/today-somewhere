@@ -1,12 +1,13 @@
 "use client";
 
-import { Languages } from "lucide-react";
+import { Droplets, Languages, Umbrella, Wind } from "lucide-react";
 
 import { CityNotes } from "@/components/city-notes";
 import { Card } from "@/components/ui/card";
 import { WeatherScene } from "@/components/weather-scene";
 import { countryCodeToFlag, type CityWeather } from "@/lib/cities";
 import {
+  formatTemperature,
   localizedCity,
   localizedCountry,
   localizedWeather,
@@ -14,7 +15,7 @@ import {
 } from "@/lib/i18n";
 
 export function CityCard({ city, index }: { city: CityWeather; index: number }) {
-  const { locale, t } = useLanguage();
+  const { locale, temperatureUnit, t } = useLanguage();
   const displayCity = localizedCity(city.city, locale);
 
   return (
@@ -42,7 +43,7 @@ export function CityCard({ city, index }: { city: CityWeather; index: number }) 
 
               <div className="text-right">
                 <p className="font-serif text-5xl tracking-[-0.07em] text-ink">
-                  {city.temperature}°
+                  {formatTemperature(city.temperature, temperatureUnit)}
                 </p>
                 <p className="mt-1 text-xs text-muted">
                   {localizedWeather(city.weatherLabel, locale)}
@@ -52,8 +53,21 @@ export function CityCard({ city, index }: { city: CityWeather; index: number }) 
 
             <div className="my-8 h-px bg-line/80" />
 
+            <div className="grid grid-cols-2 gap-x-5 gap-y-4 border-b border-line/80 pb-7 text-xs sm:grid-cols-4 md:grid-cols-2">
+              <WeatherFact
+                label={t("feelsLike")}
+                value={formatTemperature(
+                  city.apparentTemperature,
+                  temperatureUnit,
+                )}
+              />
+              <WeatherFact icon={<Droplets className="size-3.5" />} label={t("humidity")} value={`${city.humidity}%`} />
+              <WeatherFact icon={<Wind className="size-3.5" />} label={t("wind")} value={`${city.windSpeed} km/h`} />
+              <WeatherFact icon={<Umbrella className="size-3.5" />} label={t("precipitation")} value={`${city.precipitation} mm`} />
+            </div>
+
             <blockquote
-              className="font-serif text-[1.65rem] leading-[1.4] tracking-[-0.02em] text-ink sm:text-3xl"
+              className="pt-7 font-serif text-[1.65rem] leading-[1.4] tracking-[-0.02em] text-ink sm:text-3xl"
               lang={city.language}
             >
               “{city.note}”
@@ -81,5 +95,25 @@ export function CityCard({ city, index }: { city: CityWeather; index: number }) 
         </div>
       </Card>
     </article>
+  );
+}
+
+function WeatherFact({
+  icon,
+  label,
+  value,
+}: {
+  icon?: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div>
+      <p className="flex items-center gap-1.5 text-[10px] text-muted/70">
+        {icon}
+        {label}
+      </p>
+      <p className="mt-1 font-medium tabular-nums text-ink/80">{value}</p>
+    </div>
   );
 }

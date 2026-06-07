@@ -10,13 +10,14 @@ import {
 } from "react";
 
 export type Locale = "ko" | "en";
+export type TemperatureUnit = "celsius" | "fahrenheit";
 
 const messages = {
   ko: {
     heroDate: "일요일 · 6월 7일 · 어딘가",
     heroTitle1: "멀리 있는",
     heroTitle2: "평범한 하루.",
-    heroBody: "세계 곳곳의 날씨와 작은 순간을 모은 조용한 엽서함.",
+    heroBody: "예보가 아닌, 사람들이 직접 전하는 지금의 날씨.",
     wander: "천천히 여행하기",
     fromWhere: "당신이 있는 곳에서",
     locationTitle: "오늘, 당신이 있는 곳은?",
@@ -55,13 +56,17 @@ const messages = {
     soundOn: "배경음 켜기",
     soundOff: "배경음 끄기",
     language: "언어",
+    humidity: "습도",
+    feelsLike: "체감",
+    wind: "바람",
+    precipitation: "강수",
+    temperatureUnit: "온도 단위",
   },
   en: {
     heroDate: "Sunday · June 7 · Somewhere",
     heroTitle1: "Ordinary days,",
     heroTitle2: "far away.",
-    heroBody:
-      "A quiet collection of weather and small moments from people around the world.",
+    heroBody: "Not a forecast. Weather as people are feeling it right now.",
     wander: "Wander slowly",
     fromWhere: "From where you are",
     locationTitle: "Where are you today?",
@@ -101,6 +106,11 @@ const messages = {
     soundOn: "Turn ambient sound on",
     soundOff: "Turn ambient sound off",
     language: "Language",
+    humidity: "Humidity",
+    feelsLike: "Feels like",
+    wind: "Wind",
+    precipitation: "Rain",
+    temperatureUnit: "Temperature unit",
   },
 } as const;
 
@@ -108,6 +118,8 @@ type MessageKey = keyof (typeof messages)["ko"];
 type LanguageContextValue = {
   locale: Locale;
   setLocale: (locale: Locale) => void;
+  temperatureUnit: TemperatureUnit;
+  setTemperatureUnit: (unit: TemperatureUnit) => void;
   t: (key: MessageKey) => string;
 };
 
@@ -115,11 +127,19 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [locale, setLocale] = useState<Locale>("ko");
+  const [temperatureUnit, setTemperatureUnit] =
+    useState<TemperatureUnit>("celsius");
   const [hasLoadedPreference, setHasLoadedPreference] = useState(false);
 
   useEffect(() => {
     const saved = window.localStorage.getItem("today-somewhere:locale");
     if (saved === "ko" || saved === "en") setLocale(saved);
+    const savedUnit = window.localStorage.getItem(
+      "today-somewhere:temperature-unit",
+    );
+    if (savedUnit === "celsius" || savedUnit === "fahrenheit") {
+      setTemperatureUnit(savedUnit);
+    }
     setHasLoadedPreference(true);
   }, []);
 
@@ -127,15 +147,21 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     if (!hasLoadedPreference) return;
     document.documentElement.lang = locale;
     window.localStorage.setItem("today-somewhere:locale", locale);
-  }, [hasLoadedPreference, locale]);
+    window.localStorage.setItem(
+      "today-somewhere:temperature-unit",
+      temperatureUnit,
+    );
+  }, [hasLoadedPreference, locale, temperatureUnit]);
 
   const value = useMemo(
     () => ({
       locale,
       setLocale,
+      temperatureUnit,
+      setTemperatureUnit,
       t: (key: MessageKey) => messages[locale][key],
     }),
-    [locale],
+    [locale, temperatureUnit],
   );
 
   return (
@@ -206,4 +232,14 @@ export function localizedCity(city: string, locale: Locale) {
 
 export function localizedCountry(country: string, locale: Locale) {
   return locale === "ko" ? koreanCountries[country] ?? country : country;
+}
+
+export function formatTemperature(
+  celsius: number,
+  unit: TemperatureUnit,
+) {
+  if (unit === "fahrenheit") {
+    return `${Math.round((celsius * 9) / 5 + 32)}°F`;
+  }
+  return `${Math.round(celsius)}°C`;
 }

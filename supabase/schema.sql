@@ -6,6 +6,10 @@ create table if not exists public.postcards (
   country_code text not null default '',
   note text not null check (char_length(note) between 2 and 100),
   temperature smallint not null,
+  humidity smallint,
+  apparent_temperature smallint,
+  wind_speed smallint,
+  precipitation numeric(6, 2),
   weather_label text not null,
   weather_kind text not null check (
     weather_kind in ('clear', 'cloudy', 'rain', 'snow', 'night')
@@ -19,6 +23,12 @@ create table if not exists public.postcards (
 
 create index if not exists postcards_created_at_idx
   on public.postcards (created_at desc);
+
+alter table public.postcards
+  add column if not exists humidity smallint,
+  add column if not exists apparent_temperature smallint,
+  add column if not exists wind_speed smallint,
+  add column if not exists precipitation numeric(6, 2);
 
 alter table public.postcards enable row level security;
 

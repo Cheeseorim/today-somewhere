@@ -57,6 +57,7 @@ export async function POST(request: NextRequest) {
       !body.kind ||
       !weatherKinds.includes(body.kind) ||
       !Number.isFinite(body.temperature) ||
+      !Number.isFinite(body.humidity) ||
       note.length < 2 ||
       note.length > 100
     ) {
@@ -73,6 +74,16 @@ export async function POST(request: NextRequest) {
       countryCode: body.countryCode?.slice(0, 2) ?? "",
       note,
       temperature: Math.round(body.temperature as number),
+      humidity: Math.round(body.humidity as number),
+      apparentTemperature: Number.isFinite(body.apparentTemperature)
+        ? Math.round(body.apparentTemperature as number)
+        : undefined,
+      windSpeed: Number.isFinite(body.windSpeed)
+        ? Math.round(body.windSpeed as number)
+        : undefined,
+      precipitation: Number.isFinite(body.precipitation)
+        ? Number(body.precipitation)
+        : undefined,
       weatherLabel: body.weatherLabel.slice(0, 50),
       kind: body.kind,
       localTime: body.localTime.slice(0, 30),

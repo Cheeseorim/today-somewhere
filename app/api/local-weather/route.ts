@@ -18,6 +18,10 @@ type ForecastResponse = {
   timezone: string;
   current?: {
     temperature_2m: number;
+    relative_humidity_2m: number;
+    apparent_temperature: number;
+    wind_speed_10m: number;
+    precipitation: number;
     weather_code: number;
     is_day: number;
   };
@@ -166,7 +170,7 @@ export async function GET(request: NextRequest) {
     forecastUrl.searchParams.set("longitude", String(location.longitude));
     forecastUrl.searchParams.set(
       "current",
-      "temperature_2m,weather_code,is_day",
+      "temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,precipitation,weather_code,is_day",
     );
     forecastUrl.searchParams.set("timezone", location.timezone);
 
@@ -185,6 +189,10 @@ export async function GET(request: NextRequest) {
       ...location,
       timezone,
       temperature: Math.round(forecast.current.temperature_2m),
+      humidity: Math.round(forecast.current.relative_humidity_2m),
+      apparentTemperature: Math.round(forecast.current.apparent_temperature),
+      windSpeed: Math.round(forecast.current.wind_speed_10m),
+      precipitation: forecast.current.precipitation,
       weatherCode,
       isDay,
       kind: getWeatherKind(weatherCode, isDay),

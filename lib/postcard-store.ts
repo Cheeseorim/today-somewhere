@@ -11,6 +11,10 @@ export type SharedPostcard = {
   countryCode: string;
   note: string;
   temperature: number;
+  humidity?: number;
+  apparentTemperature?: number;
+  windSpeed?: number;
+  precipitation?: number;
   weatherLabel: string;
   kind: WeatherKind;
   localTime: string;
@@ -27,6 +31,10 @@ type SupabaseRow = {
   country_code: string;
   note: string;
   temperature: number;
+  humidity: number | null;
+  apparent_temperature: number | null;
+  wind_speed: number | null;
+  precipitation: number | null;
   weather_label: string;
   weather_kind: WeatherKind;
   local_time: string;
@@ -50,6 +58,10 @@ function fromRow(row: SupabaseRow): SharedPostcard {
     countryCode: row.country_code,
     note: row.note,
     temperature: row.temperature,
+    humidity: row.humidity ?? undefined,
+    apparentTemperature: row.apparent_temperature ?? undefined,
+    windSpeed: row.wind_speed ?? undefined,
+    precipitation: row.precipitation ?? undefined,
     weatherLabel: row.weather_label,
     kind: row.weather_kind,
     localTime: row.local_time,
@@ -95,7 +107,7 @@ export async function listPostcards(
   const endpoint = new URL(`${supabase.url}/rest/v1/postcards`);
   endpoint.searchParams.set(
     "select",
-    "id,city,region,country,country_code,note,temperature,weather_label,weather_kind,local_time,created_at",
+    "id,city,region,country,country_code,note,temperature,humidity,apparent_temperature,wind_speed,precipitation,weather_label,weather_kind,local_time,created_at",
   );
   endpoint.searchParams.set("status", "eq.published");
   if (city) endpoint.searchParams.set("city", `ilike.${city}`);
@@ -143,6 +155,10 @@ export async function createPostcard(
       country_code: postcard.countryCode,
       note: postcard.note,
       temperature: postcard.temperature,
+      humidity: postcard.humidity ?? null,
+      apparent_temperature: postcard.apparentTemperature ?? null,
+      wind_speed: postcard.windSpeed ?? null,
+      precipitation: postcard.precipitation ?? null,
       weather_label: postcard.weatherLabel,
       weather_kind: postcard.kind,
       local_time: postcard.localTime,

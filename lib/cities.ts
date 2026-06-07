@@ -16,6 +16,10 @@ export type CitySeed = {
   notes: Record<WeatherKind, CityNote>;
   fallback: {
     temperature: number;
+    humidity: number;
+    apparentTemperature: number;
+    windSpeed: number;
+    precipitation: number;
     weatherCode: number;
     isDay: boolean;
   };
@@ -24,6 +28,10 @@ export type CitySeed = {
 export type CityWeather = Omit<CitySeed, "notes"> &
   CityNote & {
     temperature: number;
+    humidity: number;
+    apparentTemperature: number;
+    windSpeed: number;
+    precipitation: number;
     weatherCode: number;
     isDay: boolean;
     localTime: string;
@@ -154,7 +162,7 @@ export const cities: CitySeed[] = [
     language: "ko",
     languageLabel: "Korean",
     notes: koreanNotes.seoul,
-    fallback: { temperature: 21, weatherCode: 61, isDay: true },
+    fallback: { temperature: 21, humidity: 68, apparentTemperature: 22, windSpeed: 8, precipitation: 0.4, weatherCode: 61, isDay: true },
   },
   {
     city: "Busan",
@@ -165,7 +173,7 @@ export const cities: CitySeed[] = [
     language: "ko",
     languageLabel: "Korean",
     notes: koreanNotes.busan,
-    fallback: { temperature: 22, weatherCode: 1, isDay: true },
+    fallback: { temperature: 22, humidity: 72, apparentTemperature: 23, windSpeed: 12, precipitation: 0, weatherCode: 1, isDay: true },
   },
   {
     city: "Jeju",
@@ -176,7 +184,7 @@ export const cities: CitySeed[] = [
     language: "ko",
     languageLabel: "Korean",
     notes: koreanNotes.jeju,
-    fallback: { temperature: 20, weatherCode: 3, isDay: true },
+    fallback: { temperature: 20, humidity: 76, apparentTemperature: 21, windSpeed: 18, precipitation: 0, weatherCode: 3, isDay: true },
   },
   {
     city: "Gangneung",
@@ -187,7 +195,7 @@ export const cities: CitySeed[] = [
     language: "ko",
     languageLabel: "Korean",
     notes: koreanNotes.gangneung,
-    fallback: { temperature: 19, weatherCode: 2, isDay: true },
+    fallback: { temperature: 19, humidity: 70, apparentTemperature: 18, windSpeed: 10, precipitation: 0, weatherCode: 2, isDay: true },
   },
   {
     city: "Jeonju",
@@ -198,7 +206,7 @@ export const cities: CitySeed[] = [
     language: "ko",
     languageLabel: "Korean",
     notes: koreanNotes.jeonju,
-    fallback: { temperature: 22, weatherCode: 0, isDay: true },
+    fallback: { temperature: 22, humidity: 64, apparentTemperature: 23, windSpeed: 6, precipitation: 0, weatherCode: 0, isDay: true },
   },
   {
     city: "Helsinki",
@@ -215,7 +223,7 @@ export const cities: CitySeed[] = [
       snow: { note: "Fresh snow has softened every sound on the street.", translation: "갓 내린 눈이 거리의 모든 소리를 부드럽게 만들었어요." },
       night: { note: "Still a little bright outside, even this late.", translation: "이렇게 늦은 시간인데도 밖이 아직 조금 환해요." },
     },
-    fallback: { temperature: 14, weatherCode: 2, isDay: true },
+    fallback: { temperature: 14, humidity: 74, apparentTemperature: 12, windSpeed: 16, precipitation: 0, weatherCode: 2, isDay: true },
   },
   {
     city: "Tokyo",
@@ -232,7 +240,7 @@ export const cities: CitySeed[] = [
       snow: { note: "駅前に珍しい雪が静かに降っています。", translation: "Rare snow is falling quietly in front of the station." },
       night: { note: "終電のあと、交差点が少し広く見えました。", translation: "After the last train, the crossing seemed a little wider." },
     },
-    fallback: { temperature: 25, weatherCode: 1, isDay: false },
+    fallback: { temperature: 25, humidity: 71, apparentTemperature: 27, windSpeed: 9, precipitation: 0, weatherCode: 1, isDay: false },
   },
   {
     city: "Reykjavík",
@@ -249,7 +257,7 @@ export const cities: CitySeed[] = [
       snow: { note: "Snow is gathering in the quiet spaces between houses.", translation: "집과 집 사이의 조용한 틈에 눈이 쌓이고 있어요." },
       night: { note: "The windows feel especially warm against the dark.", translation: "어둠 속 창문 불빛이 유난히 따뜻하게 느껴져요." },
     },
-    fallback: { temperature: 9, weatherCode: 3, isDay: true },
+    fallback: { temperature: 9, humidity: 79, apparentTemperature: 6, windSpeed: 22, precipitation: 0, weatherCode: 3, isDay: true },
   },
   {
     city: "Melbourne",
@@ -266,7 +274,7 @@ export const cities: CitySeed[] = [
       snow: { note: "A rare dusting of snow made everyone stop and look.", translation: "드물게 내린 얇은 눈에 모두가 멈춰 바라봤어요." },
       night: { note: "Someone left a tiny bouquet on the tram seat.", translation: "누군가 트램 좌석에 작은 꽃다발을 두고 갔어요." },
     },
-    fallback: { temperature: 11, weatherCode: 71, isDay: false },
+    fallback: { temperature: 11, humidity: 73, apparentTemperature: 9, windSpeed: 14, precipitation: 0.2, weatherCode: 71, isDay: false },
   },
 ];
 

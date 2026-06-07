@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { LocateFixed, PencilLine, Search, Send } from "lucide-react";
+import { Droplets, LocateFixed, PencilLine, Search, Send, Umbrella, Wind } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import {
   type WeatherKind,
 } from "@/lib/cities";
 import {
+  formatTemperature,
   localizedCity,
   localizedCountry,
   localizedWeather,
@@ -24,6 +25,10 @@ type LocalWeather = {
   country: string;
   countryCode: string;
   temperature: number;
+  humidity: number;
+  apparentTemperature: number;
+  windSpeed: number;
+  precipitation: number;
   weatherLabel: string;
   localTime: string;
   kind: WeatherKind;
@@ -47,7 +52,7 @@ const noteSuggestions: Record<"ko" | "en", Record<WeatherKind, string>> = {
 };
 
 export function LocationPostcard() {
-  const { locale, t } = useLanguage();
+  const { locale, temperatureUnit, t } = useLanguage();
   const [query, setQuery] = useState("");
   const [note, setNote] = useState("");
   const [weather, setWeather] = useState<LocalWeather | null>(null);
@@ -289,12 +294,19 @@ export function LocationPostcard() {
                     </div>
                     <div className="text-right">
                       <p className="font-serif text-5xl tracking-[-0.07em]">
-                        {weather.temperature}°
+                        {formatTemperature(weather.temperature, temperatureUnit)}
                       </p>
                       <p className="mt-1 text-xs text-muted">
                         {localizedWeather(weather.weatherLabel, locale)}
                       </p>
                     </div>
+                  </div>
+
+                  <div className="mt-7 grid grid-cols-2 gap-3 rounded-2xl bg-paper/55 p-4 text-xs">
+                    <WeatherMetric label={t("feelsLike")} value={formatTemperature(weather.apparentTemperature, temperatureUnit)} />
+                    <WeatherMetric icon={<Droplets className="size-3.5" />} label={t("humidity")} value={`${weather.humidity}%`} />
+                    <WeatherMetric icon={<Wind className="size-3.5" />} label={t("wind")} value={`${weather.windSpeed} km/h`} />
+                    <WeatherMetric icon={<Umbrella className="size-3.5" />} label={t("precipitation")} value={`${weather.precipitation} mm`} />
                   </div>
 
                   <div className="mt-8">
@@ -379,5 +391,25 @@ export function LocationPostcard() {
         </Card>
       </div>
     </section>
+  );
+}
+
+function WeatherMetric({
+  icon,
+  label,
+  value,
+}: {
+  icon?: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div>
+      <p className="flex items-center gap-1.5 text-[10px] text-muted/70">
+        {icon}
+        {label}
+      </p>
+      <p className="mt-1 font-medium tabular-nums text-ink/80">{value}</p>
+    </div>
   );
 }

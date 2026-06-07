@@ -8,6 +8,10 @@ import {
 type OpenMeteoResponse = {
   current?: {
     temperature_2m: number;
+    relative_humidity_2m: number;
+    apparent_temperature: number;
+    wind_speed_10m: number;
+    precipitation: number;
     weather_code: number;
     is_day: number;
   };
@@ -34,7 +38,7 @@ export async function getCitiesWeather(): Promise<CityWeather[]> {
         url.searchParams.set("longitude", String(longitude));
         url.searchParams.set(
           "current",
-          "temperature_2m,weather_code,is_day",
+          "temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,precipitation,weather_code,is_day",
         );
         url.searchParams.set("timezone", city.timezone);
 
@@ -44,6 +48,10 @@ export async function getCitiesWeather(): Promise<CityWeather[]> {
           if (data.current) {
             current = {
               temperature: Math.round(data.current.temperature_2m),
+              humidity: Math.round(data.current.relative_humidity_2m),
+              apparentTemperature: Math.round(data.current.apparent_temperature),
+              windSpeed: Math.round(data.current.wind_speed_10m),
+              precipitation: data.current.precipitation,
               weatherCode: data.current.weather_code,
               isDay: Boolean(data.current.is_day),
             };

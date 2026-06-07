@@ -8,7 +8,13 @@ import { useLanguage } from "@/lib/i18n";
 
 export function SiteHeader() {
   const [isQuiet, setIsQuiet] = useState(true);
-  const { locale, setLocale, t } = useLanguage();
+  const {
+    locale,
+    setLocale,
+    temperatureUnit,
+    setTemperatureUnit,
+    t,
+  } = useLanguage();
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
@@ -40,6 +46,19 @@ export function SiteHeader() {
               </button>
             ))}
           </div>
+          <button
+            type="button"
+            onClick={() =>
+              setTemperatureUnit(
+                temperatureUnit === "celsius" ? "fahrenheit" : "celsius",
+              )
+            }
+            className="flex h-9 min-w-11 items-center justify-center rounded-full border border-ink/10 bg-paper/55 px-3 text-[10px] font-medium text-ink/75 backdrop-blur-md transition-colors hover:bg-white/60"
+            aria-label={t("temperatureUnit")}
+            title={t("temperatureUnit")}
+          >
+            {temperatureUnit === "celsius" ? "°C" : "°F"}
+          </button>
           <Button
             variant="ghost"
             size="icon"
